@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>공부 기록 · 스터디로그</title>
+
+  <!-- 한글 폰트 Pretendard (CDN) -->
+  <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ===== 헤더 ===== -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">⏱</span>
+      <h1>스터디로그</h1>
+    </div>
+    <p class="tagline">공부 시간을 재고, 내용을 정리하고, 스스로 문제를 푼다.</p>
+
+    <!-- 탭 버튼 -->
+    <nav class="tabs">
+      <button class="tab-btn is-active" data-tab="timer">타이머</button>
+      <button class="tab-btn" data-tab="notes">노트</button>
+      <button class="tab-btn" data-tab="quiz">문제 풀기</button>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <!-- ========================================================= -->
+    <!-- 1) 타이머 탭                                                -->
+    <!-- ========================================================= -->
+    <section id="tab-timer" class="tab-panel is-active">
+      <div class="card timer-card">
+        <label class="field-label" for="subject-input">과목 / 주제</label>
+        <input id="subject-input" type="text" placeholder="예: 자료구조, 영어 단어..." />
+
+        <!-- 큰 시간 표시 -->
+        <div id="clock" class="clock">00:00:00</div>
+
+        <div class="timer-controls">
+          <button id="start-btn" class="btn btn-primary">시작</button>
+          <button id="stop-btn" class="btn btn-ghost" disabled>정지 &amp; 저장</button>
+        </div>
+
+        <!-- 집중 모드 상태 (타이머 작동 중에만 표시) -->
+        <p id="focus-status" class="focus-status" hidden></p>
+      </div>
+
+      <!-- 오늘 / 과목별 통계 -->
+      <div class="card">
+        <h2 class="card-title">오늘 공부량</h2>
+        <p id="today-total" class="big-stat">0분</p>
+        <div id="subject-stats" class="subject-stats"></div>
+      </div>
+
+      <!-- 기록 목록 -->
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">최근 기록</h2>
+          <button id="clear-sessions" class="link-btn">전체 삭제</button>
+        </div>
+        <ul id="session-list" class="session-list"></ul>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- 2) 노트 탭                                                  -->
+    <!-- ========================================================= -->
+    <section id="tab-notes" class="tab-panel">
+      <div class="card">
+        <h2 class="card-title" id="note-form-title">새 노트</h2>
+
+        <label class="field-label" for="note-title">제목</label>
+        <input id="note-title" type="text" placeholder="예: 이진 탐색 정리" />
+
+        <label class="field-label" for="note-body">내용</label>
+        <textarea id="note-body" rows="8"
+          placeholder="여기에 공부한 내용을 적어요.&#10;&#10;💡 문제 자동 출제 팁:&#10;'질문 :: 답' 형식으로 줄을 쓰면 플래시카드 문제가 만들어져요.&#10;예) 이진 탐색의 시간복잡도는? :: O(log n)&#10;&#10;일반 문장으로 쓰면 핵심어를 가린 '빈칸 채우기' 문제가 만들어져요."></textarea>
+
+        <div class="form-actions">
+          <button id="save-note" class="btn btn-primary">저장</button>
+          <button id="cancel-edit" class="btn btn-ghost" hidden>취소</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">내 노트</h2>
+        <ul id="note-list" class="note-list"></ul>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- 3) 문제 풀기 탭                                             -->
+    <!-- ========================================================= -->
+    <section id="tab-quiz" class="tab-panel">
+      <div class="card">
+        <h2 class="card-title">문제 만들기</h2>
+
+        <label class="field-label" for="quiz-source">어떤 노트로?</label>
+        <select id="quiz-source"></select>
+
+        <label class="field-label">문제 유형</label>
+        <div class="seg">
+          <label><input type="radio" name="quiz-type" value="flashcard" checked /> 플래시카드 (질문::답)</label>
+          <label><input type="radio" name="quiz-type" value="cloze" /> 빈칸 채우기</label>
+        </div>
+
+        <button id="generate-quiz" class="btn btn-primary">문제 생성</button>
+      </div>
+
+      <!-- 퀴즈 진행 영역 -->
+      <div id="quiz-area" class="card" hidden>
+        <div class="quiz-progress">
+          <span id="quiz-counter">1 / 5</span>
+          <span id="quiz-score">맞춤 0</span>
+        </div>
+
+        <div id="quiz-question" class="quiz-question"></div>
+
+        <div id="quiz-answer" class="quiz-answer" hidden></div>
+
+        <div class="quiz-controls">
+          <button id="reveal-btn" class="btn btn-primary">정답 확인</button>
+          <div id="grade-buttons" class="grade-buttons" hidden>
+            <button id="mark-wrong" class="btn btn-ghost">틀렸어요</button>
+            <button id="mark-right" class="btn btn-primary">맞췄어요</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 결과 영역 -->
+      <div id="quiz-result" class="card" hidden>
+        <h2 class="card-title">결과</h2>
+        <p id="result-text" class="big-stat"></p>
+        <button id="retry-quiz" class="btn btn-primary">다시 풀기</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>스터디로그 · 모든 데이터는 이 브라우저에만 저장돼요 (localStorage)</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
